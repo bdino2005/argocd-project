@@ -15,7 +15,7 @@ pipeline {
     stage('Build and Test') {
       steps {
         sh 'ls -ltr'
-        sh 'cd Jenkins-Zero-To-Hero/spring-boot-app && mvn clean package'
+        sh 'cd argocd-project/spring-boot-app && mvn clean package'
       }
     }
     
@@ -25,7 +25,7 @@ pipeline {
       }
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd Jenkins-Zero-To-Hero/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+          sh 'cd arcosd-project/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
         }
       }
     }
@@ -38,7 +38,7 @@ pipeline {
       }
       steps {
         script {
-          sh 'cd Jenkins-Zero-To-Hero/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
+          sh 'cd argocd-project/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
           withCredentials([string(credentialsId: 'docker-cred', variable: 'dockerhubpwd')]) {
             sh 'docker login -u bdino2005 -p ${dockerhubpwd}'
           }
@@ -54,7 +54,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
           sh "git config --global credential.helper store"
-          sh "cd Jenkins-Zero-To-Hero && git checkout main && git add . && git commit -m 'Pipeline: Update' && git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/bdino2005/Jenkins-Zero-To-Hero HEAD:main"
+          sh "cd argocd-project && git checkout main && git add . && git commit -m 'Pipeline: Update' && git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/bdino2005/Jenkins-Zero-To-Hero HEAD:main"
         }
       }
     }
